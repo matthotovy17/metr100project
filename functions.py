@@ -56,7 +56,9 @@ def createNewWeatherDataCsv():
     print(len(uniqueDates))
     
     filteredDF = df[df['dt_iso'].str[0:10].isin(uniqueDates)]
-    # filteredDF.to_csv(r'newWeatherHistory.csv', index=False)
+    filteredDF['visibility'] = filteredDF['visibility'] * 0.000621371
+    filteredDF['wind_speed'] = filteredDF['wind_speed'] * 2.23694
+    filteredDF.to_csv(r'newWeatherHistory.csv', index=False)
     print(tabulate(filteredDF, headers='keys', tablefmt='psql'))
     
 def createMainDisplayCSV(): 

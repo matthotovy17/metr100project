@@ -40,13 +40,9 @@ def isBlizardConditions(windSpeed, visibility, isSnowing, isSnowOnGround):
 def validateNumber(val):
     return 
 def randomConditions():
-    
-    tempUpperBound = 32
-    windSpeedMin = 35
-    visibilityInMiles = 1/4
+
     isSnowing = False
-    snowCurrentlyOnGround = False
-    conditionsTimeSpanHours = 3
+
     
     print("You will be prompted to enter in several weather condtions and at the end will be told if they meet the criteria for a blizzard.")
     
@@ -90,12 +86,14 @@ def todaysWeatherConditions():
     isSnowing = conditions["HasPrecipitation"] and conditions["PrecipitationType"] == "Snow"
     isSnowingNY = "Yes" if isSnowing else "No"
     visibility = conditions["Visibility"]["Imperial"]["Value"]
+    print("\n\nRelevant Weather Conditions")
     print("Wind Speed: ", windSpeed)
     print("Is it snowing?: ", isSnowingNY)
     print("Visibility (Miles): ", visibility)
     
     if isBlizardConditions(windSpeed, visibility, isSnowing, False):
         print("These conditions meet the criteria for a Blizzard Warning. If conditions have persisted for the last three hours than a Blizzard Warning should be issued.")
+
     else:
         print("These conditions do not meet the criteria for a Blizzard Warning for the following reasons: \n")
         noBlizzardReasons(windSpeed, visibility, isSnowing, False)
@@ -165,6 +163,10 @@ def historicalWeatherData(fromCounty=False):
                                round(mdt['Wind Spd Min'].mean(), 2), round(mdt['Wind Spd Max'].mean(), 2), round(mdt['Wind Spd Avg'].mean(), 2),
                                round(mdt['Visibility Min'].mean(), 2), round(mdt['Visibility Max'].mean(), 2), round(mdt['Visibility Avg'].mean(), 2),
                                sum(mdt['Had Snowfall'])))
+    
+    print("These averages look pretty convincing that Eppley Airfield reports blizzard warning conditions or at least close to blizzar warning conditions, when a blizzard wanring is issued.")
+    print("However if you take a look at the table below there are some outliers. Take a look at number 49 for instance. Having a minimum visibility of 6.2 miles? That seems a bit odd.")
+    print("Investigate more by exploring the differences between counties. We suggest looking at Douglas county (which is where Eppley Airfield is located) and Knox county (which is on the Northern boarder of Nebraska).")
     print(tabulate(mainDisplay.loc[:, mainDisplay.columns != "counties"], headers='keys', tablefmt='psql'))
     
     val = input()
@@ -215,6 +217,7 @@ def countyRoute(codes, historicalData, mainDisplay):
           You can select a county by typing in the corresponding number.
           This will filter down the alerts to the specific counties.
           Or you can 'quit', go 'back' to the aggregate board, or go back to the 'menu'.""")
+
     
     print(tabulate(codes[['County']], headers='keys', tablefmt='psql'))
     val = input()
@@ -234,6 +237,15 @@ def countyRoute(codes, historicalData, mainDisplay):
     
 def filterByCounty(countyRow, historicalData, mainDisplay):
     print("You have chose alerts for {} County".format(countyRow['County']))
+    
+    if countyRow['County'] == "Knox":
+        print("""Even though Knox county is located in Northern Nebraska, OAX is still responsible for sending out blizzard warnings for it.
+              This can result in major differences between what we expect weather to be in a blizzard warning and what Eppley Airfield reports.
+              However, this is not always the case, and some times, Eppley Airfield experiences very similar weather.
+              Take a look at a few of the hour by hour weather reports for different blizzard alert sections and see how volatile they can be.""")
+    
+    if countyRow['County'] == "Douglas":
+        print("""Since Douglas county is where Eppley Airfield is located and (OAX is located there as well) we see weather conditions that align well with our criteria for a blizzard warning.""")
     
     print("""From here you can select another county by typing in 'c'.
           'quit' the application. Go to the main 'menu'.
@@ -272,7 +284,7 @@ def __main__():
         todaysWeatherConditions()
     elif val =="3":
         historicalWeatherData()
-        
+
 __main__()
 
 print("Thanks for joining us! Have a great day!")
